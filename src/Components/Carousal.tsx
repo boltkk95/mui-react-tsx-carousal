@@ -68,7 +68,7 @@ function Carousal(props: CarousalProps) {
                                 </ImageListItem>
                         </ImageList>
 
-                        <IconButton sx={{position: 'absolute',top: '49%',left: '24%'}} >
+                        <IconButton sx={{position: 'absolute',top: '39%',left: '24%'}} >
                                     {isplaying ? <PauseCircleIcon onClick={pauseFunction} /> : 
                                     <PlayCircleOutlineIcon onClick={resumeFunction} />}
                         </IconButton>
@@ -81,10 +81,17 @@ function Carousal(props: CarousalProps) {
 
                                 <ImageList  sx={{ width: 'auto', height: '25' }} cols={5}>
                                     {props.photos.map((photo) => (
-                                        <ImageListItem sx={{borderRadius: 20}}key={photo.id}>
+                                        <ImageListItem 
+                                        sx={{
+                                            borderRadius: 20, 
+                                        }} 
+                                        key={photo.id}>
                                             <img 
                                             src={photo.url} 
-                                            alt={photo.title}  
+                                            alt={photo.title} 
+                                            style={{
+                                                opacity: photo.id === props.photos[currentIndex].id ?  1: 0.5
+                                            }} 
                                             onClick={() => setCurrentIndex(props.photos.indexOf(photo))}/>
                                         </ImageListItem>
                                         ))}
