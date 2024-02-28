@@ -1,121 +1,119 @@
-import { Box, Stack, ImageList, ImageListItem ,IconButton, Typography} from '@mui/material';
-import { useState, useEffect } from "react";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import React, { useState, useEffect } from "react"
+import {
+    Box,
+    Stack,
+    ImageList,
+    ImageListItem,
+    IconButton,
+    Typography,
+} from "@mui/material"
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline"
+import PauseCircleIcon from "@mui/icons-material/PauseCircle"
+
+type Photo = {
+    id: string
+    title: string
+    url: string
+    summary: string
+}
 
 type CarousalProps = {
-    photos:{
-        id : string
-        title: string
-        url : string
-        summary: string
-    }[]
+    photos: Photo[]
 }
-function Carousal(props: CarousalProps) {
 
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isplaying,setIsplaying] = useState(true)
-
-    const [intervalId,setIntervalId] = useState<NodeJS.Timer | undefined>() 
+function Carousal({ photos }: CarousalProps) {
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [intervalId, setIntervalId] = useState<NodeJS.Timer | undefined>()
 
     useEffect(() => {
-          resumeFunction()
-      }, []);
-      
-      function pauseFunction() {
-        clearInterval(intervalId);
-        setIsplaying(false)
-         // Pause the interval
-      }
-      
-      function resumeFunction() {
-        setIntervalId(setInterval(myTimer, 3000));
-        setIsplaying(true);
-         // Resume the interval
-      }
-    
-      let timer = currentIndex
-    function myTimer() {
-            timer= (timer+1) % props.photos.length;
-            setCurrentIndex(timer);
+        resumeFunction()
+        return () => clearInterval(intervalId as NodeJS.Timer)
+    }, [])
+
+    const pauseFunction = () => {
+        if (intervalId) {
+            clearInterval(intervalId)
+            setIntervalId(undefined)
+        }
+    }
+
+    const resumeFunction = () => {
+        const id = setInterval(myTimer, 3000)
+        setIntervalId(id)
+    }
+
+    const myTimer = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % photos.length)
     }
 
     const next = () => {
-        setCurrentIndex((currentIndex + 1) % props.photos.length);
-      };
-    
-    const prev = () => {
-        setCurrentIndex((currentIndex - 1 + props.photos.length) % props.photos.length);
-      };
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % photos.length)
+    }
 
+    const prev = () => {
+        setCurrentIndex(
+            (prevIndex) => (prevIndex - 1 + photos.length) % photos.length
+        )
+    }
 
     return (
-      <>
-        <Stack display='flex' spacing={2} direction={{xs: 'column', sm: 'row'}} padding={1}> 
-
-            <Box sx={{ width: '48%' ,p:1}}> 
-
-            <Stack spacing={2} direction= 'column'>
-
-                        <ImageList sx={{ width: {xs:350 , sm: 550, md:800, lg:1200}, height: {xs:200, md: 350},position: 'relative'}}>
-                                <ImageListItem sx={{borderRadius: 200}}>
-                                    <img 
-                                    src={props.photos[currentIndex].url} 
-                                    alt={props.photos[currentIndex].title} 
-                                    style={{borderRadius: 30}} />
-                                </ImageListItem>
-                        </ImageList>
-
-                        <IconButton sx={{position: 'absolute',top: '39%',left: '24%'}} >
-                                    {isplaying ? <PauseCircleIcon onClick={pauseFunction} /> : 
-                                    <PlayCircleOutlineIcon onClick={resumeFunction} />}
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2} padding={1}>
+            <Box sx={{ width: { xs: "100%", md: "50%" }, p: 1 }}>
+                <Stack
+                    spacing={2}
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{ width: "100%", maxHeight: "100%" }}>
+                    <ImageList
+                        sx={{
+                            // width: "100%",
+                            // height: { xs: 200, md: 350 },
+                            display: "flex",
+                            // position: "relative",
+                        }}>
+                        <ImageListItem>
+                            <img
+                                src={photos[currentIndex].url}
+                                alt={photos[currentIndex].title}
+                                style={{ borderRadius: 8 }}
+                            />
+                        </ImageListItem>
+                    </ImageList>
+                    <Box>
+                        <IconButton
+                            onClick={
+                                intervalId ? pauseFunction : resumeFunction
+                            }>
+                            {intervalId ? (
+                                <PauseCircleIcon />
+                            ) : (
+                                <PlayCircleOutlineIcon />
+                            )}
                         </IconButton>
-
-                        <Box sx={{ width: {xs:200 , sm: 300, md:350, lg:400}}}>
-                            <Stack spacing={0.1} direction='row'>
-                                <IconButton onClick={prev}>
-                                    <ArrowBackIosIcon />
-                                </IconButton>
-
-                                <ImageList  sx={{ width: 'auto', height: '25' }} cols={5}>
-                                    {props.photos.map((photo) => (
-                                        <ImageListItem 
-                                        sx={{
-                                            borderRadius: 20, 
-                                        }} 
-                                        key={photo.id}>
-                                            <img 
-                                            src={photo.url} 
-                                            alt={photo.title} 
-                                            style={{
-                                                opacity: photo.id === props.photos[currentIndex].id ?  1: 0.5
-                                            }} 
-                                            onClick={() => setCurrentIndex(props.photos.indexOf(photo))}/>
-                                        </ImageListItem>
-                                        ))}
-                                </ImageList>
-
-                                <IconButton onClick={next}>
-                                    <ArrowForwardIosIcon />
-                                </IconButton>
-
-                            </Stack>
-                        </Box>
-
-                    </Stack>   
+                    </Box>
+                    <Box>
+                        <IconButton onClick={prev}>
+                            <ArrowBackIosIcon />
+                        </IconButton>
+                        <IconButton onClick={next}>
+                            <ArrowForwardIosIcon />
+                        </IconButton>
+                    </Box>
+                </Stack>
             </Box>
-
-            <Box sx={{ width: '34%', p: 2}}> 
-                <Typography variant='h3' component='h1' gutterBottom> {props.photos[currentIndex].title} </Typography>
-                <Typography align='center'>
-                    {props.photos[currentIndex].summary}
+            <Box sx={{ width: { xs: "100%", md: "50%" }, p: 1 }}>
+                <Typography variant="h6" gutterBottom align="center">
+                    {photos[currentIndex].title}
+                </Typography>
+                <Typography align="center">
+                    {photos[currentIndex].summary}
                 </Typography>
             </Box>
-
         </Stack>
-      </>
-    );
-  }
-export default Carousal;
+    )
+}
+
+export default Carousal
