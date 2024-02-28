@@ -94,13 +94,41 @@ function Carousal({ photos }: CarousalProps) {
                             )}
                         </IconButton>
                     </Box>
-                    <Box>
-                        <IconButton onClick={prev}>
-                            <ArrowBackIosIcon />
-                        </IconButton>
-                        <IconButton onClick={next}>
-                            <ArrowForwardIosIcon />
-                        </IconButton>
+                    <Box sx={{ width: { xs: 200, sm: 300, md: 350, lg: 400 } }}>
+                        <Stack spacing={0.1} direction="row">
+                            <IconButton onClick={prev}>
+                                <ArrowBackIosIcon />
+                            </IconButton>
+                            <ImageList
+                                sx={{ width: "auto", height: "25" }}
+                                cols={5}>
+                                {photos.map((photo) => (
+                                    <ImageListItem
+                                        sx={{ borderRadius: 20 }}
+                                        key={photo.id}>
+                                        <img
+                                            src={photo.url}
+                                            alt={photo.title}
+                                            style={{
+                                                opacity:
+                                                    photo.id ===
+                                                    photos[currentIndex].id
+                                                        ? 1
+                                                        : 0.5,
+                                            }}
+                                            onClick={() =>
+                                                setCurrentIndex(
+                                                    photos.indexOf(photo)
+                                                )
+                                            }
+                                        />
+                                    </ImageListItem>
+                                ))}
+                            </ImageList>
+                            <IconButton onClick={next}>
+                                <ArrowForwardIosIcon />
+                            </IconButton>
+                        </Stack>
                     </Box>
                 </Stack>
             </Box>
